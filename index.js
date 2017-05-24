@@ -53,6 +53,35 @@ function main() {
 
   return fs.mkdir(projectPath).then(() => {
     return Promise.all([
+      fs.writeFile(path.join(projectPath, "background.js"), `console.log("${projectDirName} - background page loaded");`),
+      fs.writeFile(path.join(projectPath, "content.js"), `console.log("${projectDirName} - content script loaded");`),
+      fs.writeFile(path.join(projectPath, "manifest.json"), JSON.stringify({
+        manifest_version: 2,
+        name: projectDirName,
+        version: "0.1",
+        description: `${projectDirName} description`,
+        content_scripts: [
+          {
+            matches: ["https://developer.mozilla.org/*"],
+            js: ['content.js'],
+          },
+        ],
+        permissions: [],
+        icons: {
+          '48': 'icon.png',
+          '96': 'icon@2x.png',
+        },
+        browser_action: {
+          default_title: `${projectDirName} (browserAction)`,
+          default_icon: {
+            '19': 'button/button-19.png',
+            '38': 'button/button-38.png',
+          },
+        },
+        background: {
+          scripts: ['background.js'],
+        },
+      }, null, 2)),
     ]).then(() => printProjectCreatedMessage(projectPath));
   }, error => {
     if (error.code === "EEXIST") {
