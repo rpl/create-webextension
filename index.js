@@ -88,7 +88,7 @@ function getProjectManifest(projectDirName) {
   };
 }
 
-function main() {
+exports.main = function main() {
   const projectDirName = process.argv[2];
   let projectPath;
 
@@ -126,5 +126,3 @@ function main() {
     process.exit(1);
   });
 }
-
-main();
