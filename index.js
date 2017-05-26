@@ -16,7 +16,7 @@ const MORE_INFO_MSG = `
 
 and now?
 
-  https://addons.mozilla.org/en-US/developers/
+  ${chalk.bold.underline.white("https://addons.mozilla.org/en-US/developers/")}
 
 You can find an overview, API docs, guides and how-tos on MDN:
 
