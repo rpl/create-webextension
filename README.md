@@ -14,7 +14,7 @@ yarn create webextension my-webextension-project
 
 ## Contributing
 
-`create-webextension` currently support only a single basic WebExtension template
+`create-webextension` currently supports only a single basic WebExtension template
 (which is mostly blank), but we can definitely evaluate to support some additional templates
 (e.g. a template which already provides a setup which includes the webextension-polyfill,
 babel, unit tests, linting,  webpack/browserify configurations etc.).
