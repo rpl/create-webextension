@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "lint": "xo"
+    "lint": "xo",
+    "nsp-check": "nsp check -o summary"
   },
   "repository": {
     "type": "git",
