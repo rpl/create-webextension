@@ -25,8 +25,10 @@ describe("main", () => {
         console.log(`Created temporary directory: ${tmpPath}`);
         process.chdir(tmpPath);
 
+        const execDirPath = path.join(__dirname, "..", "bin");
+
         const exec = require("child_process").exec;
-        const cmd = `create-webextension ${projName}`;
+        const cmd = `${execDirPath}/create-webextension ${projName}`;
         return new Promise((resolve, reject) => {
           exec(cmd, (error, stdout, stderr) => {
             if (error) {
@@ -70,8 +72,10 @@ describe("main", () => {
         console.log(`Created temporary directory: ${tmpPath}`);
         process.chdir(tmpPath);
 
+        const execDirPath = path.join(__dirname, "..", "bin");
+
         const exec = require("child_process").exec;
-        const cmd = `create-webextension ${projName}`;
+        const cmd = `${execDirPath}/create-webextension ${projName}`;
         return new Promise((resolve, reject) => {
           exec(cmd, (error, stdout, stderr) => {
             console.log("exec");
