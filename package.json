@@ -7,7 +7,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "lint": "xo"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,11 @@
     "strip-ansi": "^3.0.1"
   },
   "devDependencies": {
+    "addons-linter": "^0.22.3",
+    "es6-promisify": "^5.0.0",
     "jest": "^20.0.4",
+    "nsp": "^2.6.3",
+    "tmp": "0.0.31",
     "xo": "^0.18.2"
   },
   "xo": {
@@ -43,17 +48,19 @@
     ],
     "rules": {
       "quotes": [
-        "error", "double",{
+        "error",
+        "double",
+        {
           "allowTemplateLiterals": true
         }
       ],
       "comma-dangle": [
-        "error", "always-multiline"
+        "error",
+        "always-multiline"
       ],
       "camelcase": 0,
       "arrow-parens": 0,
-      "no-process-exit": 0,
-       "unicorn/no-process-exit": 0,
+      "unicorn/no-process-exit": 0,
       "quote-props": 0,
       "unicorn/catch-error-name": 0
     }
