@@ -88,16 +88,14 @@ function getProjectManifest(projectDirName) {
 }
 
 exports.main = function main() {
-  const projectDirName = process.argv[2];
-  let projectPath;
-
-  if (!projectDirName) {
+  if (!process.argv[2]) {
     console.error(`${chalk.red("Missing project dir name.")}\n`);
     console.log(USAGE_MSG);
     process.exit(1);
   }
 
-  projectPath = path.resolve(projectDirName);
+  const projectPath = path.resolve(process.argv[2]);
+  const projectDirName = path.basename(projectPath);
 
   return fs.mkdir(projectPath).then(() => {
     return Promise.all([

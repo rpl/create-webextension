@@ -14,17 +14,13 @@ const execDirPath = path.join(__dirname, "..", "bin");
 const nodeBin = process.execPath.replace(" ", "\\ ");
 
 describe("main", () => {
-  afterEach(() => {
-    process.chdir(homeDir);
-  });
 
   test("creates files including manifest with correct name", () => withTmpDir(
     (tmpPath) => {
       const projName = "target";
-      const targetDir = path.join(tmpPath, "target");
-      process.chdir(tmpPath);//TODO remove
+      const targetDir = path.join(tmpPath, projName);
 
-      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${projName}`;
+      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${targetDir}`;
       return promisifiedExec(cmd)
       .then(() => {
         return fs.stat(path.join(targetDir, "content.js"))
@@ -47,10 +43,9 @@ describe("main", () => {
   test("created project is linted correctly", () => withTmpDir(
     (tmpPath) => {
       const projName = "target";
-      const targetDir = path.join(tmpPath, "target");
-      process.chdir(tmpPath);
+      const targetDir = path.join(tmpPath, projName);
 
-      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${projName}`;
+      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${targetDir}`;
       return promisifiedExec(cmd)
       .then(() => {
         const config = {
