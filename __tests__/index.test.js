@@ -23,7 +23,7 @@ describe("main", () => {
       process.chdir(tmpPath);
 
       const execDirPath = path.join(__dirname, "..", "bin");
-      const cmd = `${execDirPath}/create-webextension ${projName}`;
+      const cmd = `${process.execPath} ${execDirPath}/create-webextension ${projName}`;
       return promisifiedExec(cmd)
       .then(() => {
         return fs.stat(path.join(targetDir, "content.js"))
