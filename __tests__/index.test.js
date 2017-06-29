@@ -12,7 +12,6 @@ const promisifiedExec = promisify(exec);
 const homeDir = process.cwd();
 
 describe("main", () => {
-
   afterEach(() => {
     process.chdir(homeDir);
   });
@@ -56,15 +55,14 @@ describe("main", () => {
       .then(() => {
         const config = {
           _: [targetDir],
-          logLevel: 'fatal',
+          logLevel: "fatal",
           stack: true,
           pretty: true,
           warningsAsErrors: false,
           metadata: false,
-          output: 'none',
+          output: "none",
           boring: false,
           selfHosted: false,
-          shouldScanFile: (fileName) => true,
         };
         const linterInstance = linter.createInstance({
           config,

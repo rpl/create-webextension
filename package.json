@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "lint": "xo",
+    "lint": "xo --fix || true",
     "nsp-check": "nsp check -o summary"
   },
   "repository": {
@@ -36,22 +36,30 @@
   "devDependencies": {
     "addons-linter": "^0.22.3",
     "es6-promisify": "^5.0.0",
+    "eslint-plugin-jest": "^20.0.3",
     "jest": "^20.0.4",
     "nsp": "^2.6.3",
     "tmp": "0.0.31",
     "xo": "^0.18.2"
   },
-  "jest" : {
+  "jest": {
     "testEnvironment": "node",
     "testMatch": [
       "<rootDir>/__tests__/**/*.test.js?(x)",
       "<rootDir>/__tests__/*.test.js?(x)"
     ],
     "testPathIgnorePatterns": [
-       "node_modules/"
+      "node_modules/"
     ]
   },
   "xo": {
+    "extends": ["plugin:jest/recommended"],
+    "plugins": [
+      "jest"
+    ],
+    "env": {
+      "jest": true
+    },
     "space": true,
     "ignores": [
       "assets/**/*",
@@ -73,7 +81,8 @@
       "arrow-parens": 0,
       "unicorn/no-process-exit": 0,
       "quote-props": 0,
-      "unicorn/catch-error-name": 0
+      "unicorn/catch-error-name": 0,
+      "func-names": 0
     }
   }
 }
