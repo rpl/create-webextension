@@ -9,7 +9,7 @@ exports.withTmpDir = function withTmpDir(makePromise) {
       // This allows us to remove a non-empty tmp dir.
       unsafeCleanup: true,
     })
-    .then(([tmpDir,]) => {
+    .then(([tmpPath,]) => {
       return makePromise(tmpPath);
     });
 };

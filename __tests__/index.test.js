@@ -5,7 +5,7 @@ const exec = require("child_process").exec;
 const fs = require("mz/fs");
 const promisify = require("es6-promisify");
 const linter = require("addons-linter");
-const withTmpDir = require("../helpers/tmp-dir").withTmpDir;
+const withTmpDir = require("./helpers/tmp-dir").withTmpDir;
 
 const promisifiedExec = promisify(exec);
 

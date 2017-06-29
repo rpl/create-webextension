@@ -41,6 +41,16 @@
     "tmp": "0.0.31",
     "xo": "^0.18.2"
   },
+  "jest" : {
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/__tests__/**/*.test.js?(x)",
+      "<rootDir>/__tests__/*.test.js?(x)"
+    ],
+    "testPathIgnorePatterns": [
+       "node_modules/"
+    ]
+  },
   "xo": {
     "space": true,
     "ignores": [
