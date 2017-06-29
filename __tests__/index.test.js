@@ -5,7 +5,8 @@ const exec = require("child_process").exec;
 const fs = require("mz/fs");
 const promisify = require("es6-promisify");
 const linter = require("addons-linter");
-const withTmpDir = require("./helpers/tmp-dir").withTmpDir;
+const withTmpDir = require("./helpers/tmp-dir");
+const cmdRunner = require("./helpers/cmdRunner");
 
 const promisifiedExec = promisify(exec);
 
@@ -20,8 +21,8 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
 
-      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${targetDir}`;
-      return promisifiedExec(cmd)
+      const cmd = cmdRunner(`${execDirPath}/create-webextension ${targetDir}`);
+      cmd.waitForExit
       .then(() => {
         return fs.stat(path.join(targetDir, "content.js"))
         .then((contentstat) => {
