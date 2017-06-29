@@ -11,7 +11,7 @@ const promisifiedExec = promisify(exec);
 
 const homeDir = process.cwd();
 const execDirPath = path.join(__dirname, "..", "bin");
-const nodeBin = process.execPath.replace(" ", '\\ ');
+const nodeBin = process.execPath.replace(" ", '\ ');
 
 describe("main", () => {
 
