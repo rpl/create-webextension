@@ -1,116 +1,86 @@
 "use strict";
 
 const path = require("path");
+const exec = require("child_process").exec;
 const fs = require("mz/fs");
-const tmp = require("tmp");
 const promisify = require("es6-promisify");
 const linter = require("addons-linter");
+const withTmpDir = require("../helpers/tmp-dir").withTmpDir;
 
-const createTempDir = promisify(tmp.dir, {multiArgs: true});
+const promisifiedExec = promisify(exec);
 
 const homeDir = process.cwd();
 
 describe("main", () => {
-  test("creates files including manifest with correct name", () => {
-    return createTempDir(
-      {
-        prefix: "tmp-create-web-ext",
-        // This allows us to remove a non-empty tmp dir.
-        unsafeCleanup: true,
-      })
-      .then((args) => {
-        const [tmpPath, removeTempDir] = args;
-        const projName = "target";
-        const targetDir = path.join(tmpPath, "target");
-        console.log(`Created temporary directory: ${tmpPath}`);
-        process.chdir(tmpPath);
 
-        const execDirPath = path.join(__dirname, "..", "bin");
+  afterEach(() => {
+    process.chdir(homeDir);
+  });
 
-        const exec = require("child_process").exec;
-        const cmd = `${execDirPath}/create-webextension ${projName}`;
-        return new Promise((resolve, reject) => {
-          exec(cmd, (error, stdout, stderr) => {
-            if (error) {
-              reject(error);
-            } else {
-              return fs.stat(path.join(targetDir, "content.js"))
-              .then((contentstat) => {
-                expect(contentstat.isDirectory()).toBeFalsy();
-                return fs.stat(path.join(targetDir, "background.js"))
-                .then((bgstat) => {
-                  expect(bgstat.isDirectory()).toBeFalsy();
-                  return fs.readFile(path.join(targetDir, "manifest.json"), "utf-8")
-                  .then((data) => {
-                    const parsed = JSON.parse(data);
-                    expect(parsed.name).toEqual(projName);
-                  })
-                  .then(() => {
-                    removeTempDir();
-                    process.chdir(homeDir);
-                    resolve();
-                  });
-                });
-              });
-            }
+  test("creates files including manifest with correct name", () => withTmpDir(
+    (tmpPath) => {
+      const projName = "target";
+      const targetDir = path.join(tmpPath, "target");
+      process.chdir(tmpPath);
+
+      const execDirPath = path.join(__dirname, "..", "bin");
+      const cmd = `${execDirPath}/create-webextension ${projName}`;
+      return promisifiedExec(cmd)
+      .then(() => {
+        return fs.stat(path.join(targetDir, "content.js"))
+        .then((contentstat) => {
+          expect(contentstat.isDirectory()).toBeFalsy();
+          return fs.stat(path.join(targetDir, "background.js"))
+          .then((bgstat) => {
+            expect(bgstat.isDirectory()).toBeFalsy();
+            return fs.readFile(path.join(targetDir, "manifest.json"), "utf-8")
+            .then((data) => {
+              const parsed = JSON.parse(data);
+              expect(parsed.name).toEqual(projName);
+            });
           });
         });
       });
-  });
+    })
+  );
 
-  test("created project is linted correctly", () => {
-    return createTempDir(
-      {
-        prefix: "tmp-create-web-ext",
-        // This allows us to remove a non-empty tmp dir.
-        unsafeCleanup: true,
-      })
-      .then((args) => {
-        const [tmpPath, removeTempDir] = args;
-        const projName = "target";
-        const targetDir = path.join(tmpPath, "target");
-        console.log(`Created temporary directory: ${tmpPath}`);
-        process.chdir(tmpPath);
+  test("created project is linted correctly", () => withTmpDir(
+    (tmpPath) => {
+      const projName = "target";
+      const targetDir = path.join(tmpPath, "target");
+      process.chdir(tmpPath);
 
-        const execDirPath = path.join(__dirname, "..", "bin");
-
-        const exec = require("child_process").exec;
-        const cmd = `${execDirPath}/create-webextension ${projName}`;
-        return new Promise((resolve, reject) => {
-          exec(cmd, (error, stdout, stderr) => {
-            console.log("exec");
-            if (error) {
-              reject(error);
-            } else {
-              const config = {
-                _: [targetDir],
-                logLevel: 'debug',
-                stack: false,
-                pretty: true,
-                warningsAsErrors: false,
-                metadata: false,
-                output: 'none',
-                boring: false,
-                selfHosted: false,
-                shouldScanFile: (fileName) => true,
-              };
-              const linterInstance = linter.createInstance({
-                config,
-                runAsBinary:false,
-              });
-              return linterInstance.run()
-              .then((instance) => {
-                const summary = {
-                  errors: 0,
-                  notices: 0,
-                  warnings: 0,
-                };
-                expect(instance.summary).toEqual(summary);
-                resolve();
-              })
-            }
-          });
+      const execDirPath = path.join(__dirname, "..", "bin");
+      const cmd = `${execDirPath}/create-webextension ${projName}`;
+      return promisifiedExec(cmd)
+      .then(() => {
+        const config = {
+          _: [targetDir],
+          logLevel: 'fatal',
+          stack: true,
+          pretty: true,
+          warningsAsErrors: false,
+          metadata: false,
+          output: 'none',
+          boring: false,
+          selfHosted: false,
+          shouldScanFile: (fileName) => true,
+        };
+        const linterInstance = linter.createInstance({
+          config,
+          runAsBinary: false,
         });
+        return linterInstance.run()
+        .then((instance) => {
+          const summary = {
+            errors: 0,
+            notices: 0,
+            warnings: 0,
+          };
+          expect(instance.summary).toEqual(summary);
+        })
+        .catch((err) => console.error("addons-linter failure: ", err));
       });
-  });
+    })
+  );
 });
