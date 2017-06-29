@@ -10,6 +10,8 @@ const withTmpDir = require("./helpers/tmp-dir").withTmpDir;
 const promisifiedExec = promisify(exec);
 
 const homeDir = process.cwd();
+const execDirPath = path.join(__dirname, "..", "bin");
+const nodeBin = process.execPath.replace(" ", "\\ ");
 
 describe("main", () => {
   afterEach(() => {
@@ -20,10 +22,9 @@ describe("main", () => {
     (tmpPath) => {
       const projName = "target";
       const targetDir = path.join(tmpPath, "target");
-      process.chdir(tmpPath);
+      process.chdir(tmpPath);//TODO remove
 
-      const execDirPath = path.join(__dirname, "..", "bin");
-      const cmd = `${process.execPath} ${execDirPath}/create-webextension ${projName}`;
+      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${projName}`;
       return promisifiedExec(cmd)
       .then(() => {
         return fs.stat(path.join(targetDir, "content.js"))
@@ -49,8 +50,7 @@ describe("main", () => {
       const targetDir = path.join(tmpPath, "target");
       process.chdir(tmpPath);
 
-      const execDirPath = path.join(__dirname, "..", "bin");
-      const cmd = `${execDirPath}/create-webextension ${projName}`;
+      const cmd = `${nodeBin} ${execDirPath}/create-webextension ${projName}`;
       return promisifiedExec(cmd)
       .then(() => {
         const config = {
