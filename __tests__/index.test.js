@@ -68,5 +68,4 @@ describe("main", () => {
       expect(instance.summary).toEqual(summary);
     })
   );
-
 });
