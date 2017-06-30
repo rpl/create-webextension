@@ -23,6 +23,9 @@
     "addon"
   ],
   "author": "Luca Greco <lgreco@mozilla.com>",
+  "contributors": [
+    "Elvina Valieva <elvinavalieva@gmail.com>"
+  ],
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/rpl/create-webextension/issues"
