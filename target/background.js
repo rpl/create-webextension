@@ -1,1 +1,0 @@
-console.log("target - background page loaded");
