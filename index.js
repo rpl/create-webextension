@@ -1,8 +1,8 @@
 "use strict";
 
+const path = require("path");
 const chalk = require("chalk");
 const fs = require("mz/fs");
-const path = require("path");
 const stripAnsi = require("strip-ansi");
 
 const USAGE_MSG = `Usage: create-webextension project_dir_name`;
@@ -50,11 +50,10 @@ Congratulations!!! A new WebExtension has been created at:
 
 function getProjectReadme(projectDirName) {
   return fs.readFile(path.join(__dirname, "assets", "webextension-logo.ascii"))
-    .then(asciiLogo => {
+    .then(() => {
       return `# ${projectDirName}\n${README}${MORE_INFO_MSG}`;
     });
 }
-
 
 function getPlaceholderIcon() {
   return fs.readFile(path.join(__dirname, "assets", "icon.png"));
@@ -69,36 +68,34 @@ function getProjectManifest(projectDirName) {
     content_scripts: [
       {
         matches: ["https://developer.mozilla.org/*"],
-        js: ['content.js'],
+        js: ["content.js"],
       },
     ],
     permissions: [],
     icons: {
-      '64': 'icon.png',
+      "64": "icon.png",
     },
     browser_action: {
       default_title: `${projectDirName} (browserAction)`,
       default_icon: {
-        '64': 'icon.png',
+        "64": "icon.png",
       },
     },
     background: {
-      scripts: ['background.js'],
+      scripts: ["background.js"],
     },
   };
 }
 
 exports.main = function main() {
-  const projectDirName = process.argv[2];
-  let projectPath;
-
-  if (!projectDirName) {
+  if (!process.argv[2]) {
     console.error(`${chalk.red("Missing project dir name.")}\n`);
     console.log(USAGE_MSG);
     process.exit(1);
   }
 
-  projectPath = path.resolve(projectDirName);
+  const projectPath = path.resolve(process.argv[2]);
+  const projectDirName = path.basename(projectPath);
 
   return fs.mkdir(projectPath).then(() => {
     return Promise.all([
@@ -125,4 +122,4 @@ exports.main = function main() {
     console.error(error);
     process.exit(1);
   });
-}
+};
