@@ -9,8 +9,12 @@ module.exports = function cmdRunner(cmdArgs) {
     let errorData = "";
     let outputData = "";
 
-    spawnedProcess.stderr.on("data", (data) => errorData += data);
-    spawnedProcess.stdout.on("data", (data) => outputData += data);
+    spawnedProcess.stderr.on("data", (data) => {
+      errorData += data;
+    });
+    spawnedProcess.stdout.on("data", (data) => {
+      outputData += data;
+    });
 
     spawnedProcess.on("close", (exitCode) => {
       resolve({

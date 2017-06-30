@@ -6,7 +6,6 @@ const linter = require("addons-linter");
 const withTmpDir = require("./helpers/tmp-dir");
 const cmdRunner = require("./helpers/cmd-runner");
 
-const homeDir = process.cwd();
 const execDirPath = path.join(__dirname, "..", "bin");
 
 describe("main", () => {
@@ -15,27 +14,27 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
 
-      const cmd = cmdRunner([`${execDirPath}/create-webextension`,`${targetDir}`]);
+      const cmd = cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
       await cmd.waitForExit;
 
       try {
-        const contentStat  = await fs.stat(path.join(targetDir, "content.js"));
+        const contentStat = await fs.stat(path.join(targetDir, "content.js"));
         expect(contentStat.isDirectory()).toBeFalsy();
       } catch (err) {
-        throw err
+        throw err;
       }
       try {
         const bgStat = await fs.stat(path.join(targetDir, "background.js"));
         expect(bgStat.isDirectory()).toBeFalsy();
       } catch (err) {
-        throw err
+        throw err;
       }
       try {
         const manifest = await fs.readFile(path.join(targetDir, "manifest.json"), "utf-8");
         const parsed = JSON.parse(manifest);
         expect(parsed.name).toEqual(projName);
       } catch (err) {
-        throw err
+        throw err;
       }
     })
   );
@@ -45,7 +44,7 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
 
-      const cmd = cmdRunner([`${execDirPath}/create-webextension`,`${targetDir}`]);
+      const cmd = cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
       await cmd.waitForExit;
       const config = {
         _: [targetDir],
@@ -71,8 +70,8 @@ describe("main", () => {
       try {
         const instance = await linterInstance.run();
         expect(instance.summary).toEqual(summary);
-      } catch(err) {
-        throw err
+      } catch (err) {
+        throw err;
       }
     })
   );
