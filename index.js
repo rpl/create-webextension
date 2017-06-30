@@ -50,7 +50,7 @@ Congratulations!!! A new WebExtension has been created at:
 
 function getProjectReadme(projectDirName) {
   return fs.readFile(path.join(__dirname, "assets", "webextension-logo.ascii"))
-    .then(asciiLogo => {
+    .then(asciiLogo => { // eslint-disable-line no-unused-vars
       return `# ${projectDirName}\n${README}${MORE_INFO_MSG}`;
     });
 }

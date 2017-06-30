@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "addons-linter": "^0.22.3",
-    "es6-promisify": "^5.0.0",
     "eslint-plugin-jest": "^20.0.3",
     "jest": "^20.0.4",
     "nsp": "^2.6.3",
@@ -58,7 +57,7 @@
       "jest"
     ],
     "env": {
-      "jest": true
+      "jest/globals": true
     },
     "space": true,
     "ignores": [
