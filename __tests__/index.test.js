@@ -39,6 +39,10 @@ describe("main", () => {
 
       const cmd = await cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
 
+      if (cmd.exitCode !== 0) {
+        throw new Error(`Command Run Failed: ${cmd.stderr}`);
+      }
+
       const config = {
         _: [targetDir],
         logLevel: "fatal",
@@ -64,4 +68,5 @@ describe("main", () => {
       expect(instance.summary).toEqual(summary);
     })
   );
+
 });
