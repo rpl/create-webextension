@@ -5,7 +5,7 @@ module.exports = function cmdRunner(cmdArgs) {
     process.execPath, cmdArgs,
   );
 
-  const waitForExit = new Promise((resolve) => {
+  return new Promise((resolve) => {
     let errorData = "";
     let outputData = "";
 
@@ -24,6 +24,4 @@ module.exports = function cmdRunner(cmdArgs) {
       });
     });
   });
-
-  return {waitForExit, spawnedProcess};
 };

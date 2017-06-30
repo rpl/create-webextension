@@ -14,28 +14,21 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
 
-      const cmd = cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
-      await cmd.waitForExit;
+      const cmd = await cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
 
-      try {
-        const contentStat = await fs.stat(path.join(targetDir, "content.js"));
-        expect(contentStat.isDirectory()).toBeFalsy();
-      } catch (err) {
-        throw err;
+      if (cmd.exitCode !== 0) {
+        throw new Error(`Command Run Failed: ${cmd.stderr}`);
       }
-      try {
-        const bgStat = await fs.stat(path.join(targetDir, "background.js"));
-        expect(bgStat.isDirectory()).toBeFalsy();
-      } catch (err) {
-        throw err;
-      }
-      try {
-        const manifest = await fs.readFile(path.join(targetDir, "manifest.json"), "utf-8");
-        const parsed = JSON.parse(manifest);
-        expect(parsed.name).toEqual(projName);
-      } catch (err) {
-        throw err;
-      }
+
+      const contentStat = await fs.stat(path.join(targetDir, "content.js"));
+      expect(contentStat.isDirectory()).toBeFalsy();
+
+      const bgStat = await fs.stat(path.join(targetDir, "background.js"));
+      expect(bgStat.isDirectory()).toBeFalsy();
+
+      const manifest = await fs.readFile(path.join(targetDir, "manifest.json"), "utf-8");
+      const parsed = JSON.parse(manifest);
+      expect(parsed.name).toEqual(projName);
     })
   );
 
@@ -44,8 +37,8 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
 
-      const cmd = cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
-      await cmd.waitForExit;
+      const cmd = await cmdRunner([`${execDirPath}/create-webextension`, `${targetDir}`]);
+
       const config = {
         _: [targetDir],
         logLevel: "fatal",
@@ -67,12 +60,8 @@ describe("main", () => {
         warnings: 0,
       };
 
-      try {
-        const instance = await linterInstance.run();
-        expect(instance.summary).toEqual(summary);
-      } catch (err) {
-        throw err;
-      }
+      const instance = await linterInstance.run();
+      expect(instance.summary).toEqual(summary);
     })
   );
 });
