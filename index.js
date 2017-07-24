@@ -87,14 +87,14 @@ function getProjectManifest(projectDirName) {
   };
 }
 
-exports.main = function main() {
-  if (!process.argv[2]) {
+exports.main = function main(dirPath) {
+  if (!dirPath) {
     console.error(`${chalk.red("Missing project dir name.")}\n`);
     console.log(USAGE_MSG);
     process.exit(1);
   }
 
-  const projectPath = path.resolve(process.argv[2]);
+  const projectPath = path.resolve(dirPath);
   const projectDirName = path.basename(projectPath);
 
   return fs.mkdir(projectPath).then(() => {
