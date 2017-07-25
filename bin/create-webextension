@@ -1,3 +1,12 @@
 #!/usr/bin/env node
+const chalk = require("chalk");
+
+const USAGE_MSG = `Usage: create-webextension project_dir_name`;
+
+if (!process.argv[2]) {
+  console.error(`${chalk.red("Missing project dir name.")}\n`);
+  console.log(USAGE_MSG);
+  process.exit(1);
+}
 
 require("..").main(process.argv[2]);

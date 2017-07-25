@@ -5,8 +5,6 @@ const chalk = require("chalk");
 const fs = require("mz/fs");
 const stripAnsi = require("strip-ansi");
 
-const USAGE_MSG = `Usage: create-webextension project_dir_name`;
-
 const README = `
 This project contains a blank WebExtension addon, a "white canvas" for your new experiment of
 extending and remixing the Web.
@@ -89,9 +87,7 @@ function getProjectManifest(projectDirName) {
 
 exports.main = function main(dirPath) {
   if (!dirPath) {
-    console.error(`${chalk.red("Missing project dir name.")}\n`);
-    console.log(USAGE_MSG);
-    process.exit(1);
+    throw new Error("Project directory name is a compulsory argument");
   }
 
   const projectPath = path.resolve(dirPath);
