@@ -87,7 +87,7 @@ function getProjectManifest(projectDirName) {
 
 exports.main = function main(dirPath) {
   if (!dirPath) {
-    throw new Error("Project directory name is a compulsory argument");
+    throw new Error("Project directory name is a mandatory argument");
   }
 
   const projectPath = path.resolve(dirPath);
@@ -106,16 +106,13 @@ exports.main = function main(dirPath) {
       .then(() => getProjectReadme(projectDirName))
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
-      .then(() => getProjectCreatedMessage(projectPath))
-      .then(console.log);
+      .then(() => getProjectCreatedMessage(projectPath));
   }, error => {
     if (error.code === "EEXIST") {
       const msg = `Unable to create a new WebExtension: ${chalk.bold.underline(projectPath)} dir already exist.`;
-      console.error(`${chalk.red(msg)}\n`);
-      process.exit(1);
+      throw new Error(msg);
     }
   }).catch((error) => {
-    console.error(error);
-    process.exit(1);
+    throw error;
   });
 };

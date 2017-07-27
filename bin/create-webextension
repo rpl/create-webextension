@@ -9,4 +9,6 @@ if (!process.argv[2]) {
   process.exit(1);
 }
 
-require("..").main(process.argv[2]);
+require("..").main(process.argv[2])
+  .then(console.log)
+  .catch(err => console.log(err.message));
