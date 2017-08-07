@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 const chalk = require("chalk");
+const UsageError = require("../errors").UsageError;
+const onlyInstancesOf = require("../errors").onlyInstancesOf;
+
 
 const USAGE_MSG = `Usage: create-webextension project_dir_name`;
 
@@ -11,4 +14,7 @@ if (!process.argv[2]) {
 
 require("..").main(process.argv[2])
   .then(console.log)
-  .catch(err => console.log(err.message));
+  .catch(onlyInstancesOf(UsageError, (error) => {
+    console.log(`${chalk.red(error.message)}\n`);
+    process.exit(1);
+  }));

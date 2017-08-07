@@ -4,6 +4,7 @@ const path = require("path");
 const chalk = require("chalk");
 const fs = require("mz/fs");
 const stripAnsi = require("strip-ansi");
+const UsageError = require("./errors").UsageError;
 
 const README = `
 This project contains a blank WebExtension addon, a "white canvas" for your new experiment of
@@ -110,7 +111,7 @@ exports.main = function main(dirPath) {
   }, error => {
     if (error.code === "EEXIST") {
       const msg = `Unable to create a new WebExtension: ${chalk.bold.underline(projectPath)} dir already exist.`;
-      throw new Error(msg);
+      throw new UsageError(msg);
     }
   }).catch((error) => {
     throw error;
