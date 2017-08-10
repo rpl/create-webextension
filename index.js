@@ -107,13 +107,14 @@ exports.main = function main(dirPath) {
       .then(() => getProjectReadme(projectDirName))
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
-      .then(() => getProjectCreatedMessage(projectPath));
+      .then(() => {
+        const projectCreatedMessage = getProjectCreatedMessage(projectPath);
+        return {projectPath, projectCreatedMessage};
+      });
   }, error => {
     if (error.code === "EEXIST") {
       const msg = `Unable to create a new WebExtension: ${chalk.bold.underline(projectPath)} dir already exist.`;
       throw new UsageError(msg);
     }
-  }).catch((error) => {
-    throw error;
   });
 };

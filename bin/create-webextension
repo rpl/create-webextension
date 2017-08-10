@@ -15,6 +15,10 @@ if (!process.argv[2]) {
 require("..").main(process.argv[2])
   .then(console.log)
   .catch(onlyInstancesOf(UsageError, (error) => {
-    console.log(`${chalk.red(error.message)}\n`);
+    console.error(`${chalk.red(error.message)}\n`);
     process.exit(1);
-  }));
+  }))
+  .catch((error) => {
+    console.error(`${chalk.red(error.message)}: ${error.stack}\n`); // or something similar that prints both the message and the stack
+    process.exit(1);
+  });

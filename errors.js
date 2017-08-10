@@ -4,17 +4,9 @@ exports.onlyInstancesOf = function (errorType, handler) {
   return (error) => {
     if (error instanceof errorType) {
       return handler(error);
-    // eslint-disable-next-line no-else-return
-    } else {
-      console.log(error.stack);
-      process.exit(1);
     }
+    throw error;
   };
 };
 
-exports.UsageError = class UsageError extends ES6Error {
-  // eslint-disable-next-line  no-useless-constructor
-  constructor(message) {
-    super(message);
-  }
-};
+exports.UsageError = class UsageError extends ES6Error {};
