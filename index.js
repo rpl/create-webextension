@@ -35,16 +35,17 @@ a WebExtension from the command line:
   ${chalk.bold.blue("web-ext run -s /path/to/extension")}
 `;
 
+const asciiLogo = fs.readFileSync(
+  path.join(__dirname, "assets", "webextension-logo.ascii")
+);
+
 function getProjectCreatedMessage(projectPath) {
-  return fs.readFile(path.join(__dirname, "assets", "webextension-logo.ascii"))
-           .then(asciiLogo => {
-             const PROJECT_CREATED_MSG = `\n
-Congratulations!!! A new WebExtension has been created at:
+  const PROJECT_CREATED_MSG = `\n
+  Congratulations!!! A new WebExtension has been created at:
 
-  ${chalk.bold(chalk.green(projectPath))}`;
+  ${chalk.bold(chalk.green(projectPath))}`; 
 
-             return `${asciiLogo} ${PROJECT_CREATED_MSG} ${MORE_INFO_MSG}`;
-           });
+  return `${asciiLogo} ${PROJECT_CREATED_MSG} ${MORE_INFO_MSG}`;
 }
 
 function getProjectReadme(projectDirName) {
@@ -86,29 +87,37 @@ function getProjectManifest(projectDirName) {
   };
 }
 
-exports.main = function main(dirPath) {
+function main({
+  dirPath,
+  baseDir = process.cwd(),
+  getProjectManifestFn = getProjectManifest,
+  getPlaceholderIconFn = getPlaceholderIcon,
+  getProjectReadmeFn = getProjectReadme,
+  getProjectCreatedMessageFn = getProjectCreatedMessage,
+}) {
   if (!dirPath) {
     throw new Error("Project directory name is a mandatory argument");
   }
 
-  const projectPath = path.resolve(dirPath);
+  const projectPath = path.resolve(baseDir, dirPath);
+  console.log(projectPath);
   const projectDirName = path.basename(projectPath);
 
   return fs.mkdir(projectPath).then(() => {
     return Promise.all([
       fs.writeFile(path.join(projectPath, "manifest.json"),
-                   JSON.stringify(getProjectManifest(projectDirName), null, 2)),
+                   JSON.stringify(getProjectManifestFn(projectDirName), null, 2)),
       fs.writeFile(path.join(projectPath, "background.js"),
                    `console.log("${projectDirName} - background page loaded");`),
       fs.writeFile(path.join(projectPath, "content.js"),
                    `console.log("${projectDirName} - content script loaded");`),
-    ]).then(() => getPlaceholderIcon())
+    ]).then(() => getPlaceholderIconFn())
       .then(iconData => fs.writeFile(path.join(projectPath, "icon.png"), iconData))
-      .then(() => getProjectReadme(projectDirName))
+      .then(() => getProjectReadmeFn(projectDirName))
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
-      .then(() => {
-        const projectCreatedMessage = getProjectCreatedMessage(projectPath);
+      .then(async () => {
+        const projectCreatedMessage = await getProjectCreatedMessageFn(projectPath);
         return {projectPath, projectCreatedMessage};
       });
   }, error => {
@@ -117,4 +126,10 @@ exports.main = function main(dirPath) {
       throw new UsageError(msg);
     }
   });
+}
+
+module.exports = {
+  main,
+  MORE_INFO_MSG,
+  asciiLogo,
 };

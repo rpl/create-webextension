@@ -3,10 +3,10 @@
 const path = require("path");
 const fs = require("mz/fs");
 const linter = require("addons-linter");
-const withTmpDir = require("./helpers/tmp-dir");
-const cmdRunner = require("./helpers/cmd-runner");
+const withTmpDir = require("../helpers/tmp-dir");
+const cmdRunner = require("../helpers/cmd-runner");
 
-const execDirPath = path.join(__dirname, "..", "bin");
+const execDirPath = path.join(__dirname, "../..", "bin");
 
 describe("main", () => {
   test("creates files including manifest with correct name", () => withTmpDir(

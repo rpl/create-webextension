@@ -12,8 +12,8 @@ if (!process.argv[2]) {
   process.exit(1);
 }
 
-require("..").main(process.argv[2])
-  .then(console.log)
+require("..").main({dirPath: process.argv[2]})
+  .then(({projectCreatedMessage}) => console.log(projectCreatedMessage))
   .catch(onlyInstancesOf(UsageError, (error) => {
     console.error(`${chalk.red(error.message)}\n`);
     process.exit(1);
