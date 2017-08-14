@@ -4,6 +4,8 @@ const path = require("path");
 const chalk = require("chalk");
 const fs = require("mz/fs");
 const withTmpDir = require("../helpers/tmp-dir");
+const onlyInstancesOf = require("../../errors").onlyInstancesOf;
+const UsageError = require("../../errors").UsageError;
 const main = require("../../index").main;
 const MORE_INFO_MSG = require("../../index").MORE_INFO_MSG;
 const asciiLogo = require("../../index").asciiLogo;
@@ -14,7 +16,7 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
       const expectedMessage =
-      `${asciiLogo} \n` + `
+      `${asciiLogo} \n
   Congratulations!!! A new WebExtension has been created at:
 
   ${chalk.bold(chalk.green(targetDir))} ${MORE_INFO_MSG}`;
@@ -33,7 +35,7 @@ describe("main", () => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
 
-      const result = await main({
+      await main({
         dirPath: projName,
         baseDir: tmpPath,
       });
@@ -50,6 +52,76 @@ describe("main", () => {
       const manifest = await fs.readFile(path.join(targetDir, "manifest.json"), "utf-8");
       const parsed = JSON.parse(manifest);
       expect(parsed.name).toEqual(projName);
+    })
+  );
+
+  test("calls all of its necessary dependencies", () => withTmpDir(
+    async (tmpPath) => {
+      const projName = "target";
+      const targetDir = path.join(tmpPath, projName);
+
+      const getProjectManifestMock = jest.fn();
+      const getPlaceholderIconMock = jest.fn();
+      const getProjectReadmeMock = jest.fn();
+      const getProjectCreatedMessageMock = jest.fn();
+
+      await main({
+        dirPath: projName,
+        baseDir: tmpPath,
+        getProjectManifestFn: getProjectManifestMock,
+        getPlaceholderIconFn: getPlaceholderIconMock,
+        getProjectReadmeFn: getProjectReadmeMock,
+        getProjectCreatedMessageFn: getProjectCreatedMessageMock,
+      });
+
+      expect(getProjectManifestMock.mock.calls.length).toBe(1);
+      expect(getProjectManifestMock.mock.calls[0][0]).toBe(projName);
+
+      expect(getPlaceholderIconMock.mock.calls.length).toBe(1);
+
+      expect(getProjectReadmeMock.mock.calls.length).toBe(1);
+      expect(getProjectReadmeMock.mock.calls[0][0]).toBe(projName);
+
+      expect(getProjectCreatedMessageMock.mock.calls.length).toBe(1);
+      expect(getProjectCreatedMessageMock.mock.calls[0][0]).toBe(targetDir);
+    })
+  );
+
+  test("throws Usage Error when directory already exists", () => withTmpDir(
+    async (tmpPath) => {
+      const projName = "target";
+      const targetDir = path.join(tmpPath, projName);
+      await fs.mkdir(targetDir);
+
+      try {
+        await main({
+          dirPath: projName,
+          baseDir: tmpPath,
+        });
+      } catch (error) {
+        onlyInstancesOf(UsageError, () => {
+          expect(error.message).toMatch(/dir already exists/);
+        });
+      }
+    })
+  );
+
+  test("throws error when directory already exists", () => withTmpDir(
+    async (tmpPath) => {
+      const projName = "target";
+      const getPlaceholderIconMock = jest.fn(() => {
+        throw new Error("error");
+      });
+
+      try {
+        await main({
+          dirPath: projName,
+          baseDir: tmpPath,
+          getPlaceholderIconFn: getPlaceholderIconMock,
+        });
+      } catch (error) {
+        expect(error.message).toMatch(/error/);
+      }
     })
   );
 });

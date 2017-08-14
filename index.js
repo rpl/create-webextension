@@ -43,7 +43,7 @@ function getProjectCreatedMessage(projectPath) {
   const PROJECT_CREATED_MSG = `\n
   Congratulations!!! A new WebExtension has been created at:
 
-  ${chalk.bold(chalk.green(projectPath))}`; 
+  ${chalk.bold(chalk.green(projectPath))}`;
 
   return `${asciiLogo} ${PROJECT_CREATED_MSG} ${MORE_INFO_MSG}`;
 }
@@ -100,7 +100,6 @@ function main({
   }
 
   const projectPath = path.resolve(baseDir, dirPath);
-  console.log(projectPath);
   const projectDirName = path.basename(projectPath);
 
   return fs.mkdir(projectPath).then(() => {
@@ -122,7 +121,7 @@ function main({
       });
   }, error => {
     if (error.code === "EEXIST") {
-      const msg = `Unable to create a new WebExtension: ${chalk.bold.underline(projectPath)} dir already exist.`;
+      const msg = `Unable to create a new WebExtension: ${chalk.bold.underline(projectPath)} dir already exists.`;
       throw new UsageError(msg);
     }
   });
