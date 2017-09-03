@@ -1,25 +1,20 @@
 "use strict";
 
 const path = require("path");
-const chalk = require("chalk");
 const fs = require("mz/fs");
 const withTmpDir = require("../helpers/tmp-dir");
-const onlyInstancesOf = require("../../errors").onlyInstancesOf;
 const UsageError = require("../../errors").UsageError;
 const main = require("../../index").main;
-const MORE_INFO_MSG = require("../../index").MORE_INFO_MSG;
-const asciiLogo = require("../../index").asciiLogo;
+const getProjectCreatedMessage =
+  require("../../index").getProjectCreatedMessage;
 
 describe("main", () => {
   test("returns project path and creation message", () => withTmpDir(
     async (tmpPath) => {
       const projName = "target";
       const targetDir = path.join(tmpPath, projName);
-      const expectedMessage =
-      `${asciiLogo} \n
-  Congratulations!!! A new WebExtension has been created at:
-
-  ${chalk.bold(chalk.green(targetDir))} ${MORE_INFO_MSG}`;
+      const dirname = path.join(__dirname, "..", "..");
+      const expectedMessage = await getProjectCreatedMessage(targetDir, dirname);
 
       const result = await main({
         dirPath: projName,
@@ -41,13 +36,13 @@ describe("main", () => {
       });
 
       const contentStat = await fs.stat(path.join(targetDir, "content.js"));
-      expect(contentStat.isDirectory()).toBeFalsy();
+      expect(contentStat.isFile()).toBeTruthy();
 
       const bgStat = await fs.stat(path.join(targetDir, "background.js"));
-      expect(bgStat.isDirectory()).toBeFalsy();
+      expect(bgStat.isFile()).toBeTruthy();
 
       const rmStat = await fs.stat(path.join(targetDir, "README.md"));
-      expect(rmStat.isDirectory()).toBeFalsy();
+      expect(rmStat.isFile()).toBeTruthy();
 
       const manifest = await fs.readFile(path.join(targetDir, "manifest.json"), "utf-8");
       const parsed = JSON.parse(manifest);
@@ -58,12 +53,10 @@ describe("main", () => {
   test("calls all of its necessary dependencies", () => withTmpDir(
     async (tmpPath) => {
       const projName = "target";
-      const targetDir = path.join(tmpPath, projName);
 
       const getProjectManifestMock = jest.fn();
       const getPlaceholderIconMock = jest.fn();
       const getProjectReadmeMock = jest.fn();
-      const getProjectCreatedMessageMock = jest.fn();
 
       await main({
         dirPath: projName,
@@ -71,7 +64,6 @@ describe("main", () => {
         getProjectManifestFn: getProjectManifestMock,
         getPlaceholderIconFn: getPlaceholderIconMock,
         getProjectReadmeFn: getProjectReadmeMock,
-        getProjectCreatedMessageFn: getProjectCreatedMessageMock,
       });
 
       expect(getProjectManifestMock.mock.calls.length).toBe(1);
@@ -81,9 +73,6 @@ describe("main", () => {
 
       expect(getProjectReadmeMock.mock.calls.length).toBe(1);
       expect(getProjectReadmeMock.mock.calls[0][0]).toBe(projName);
-
-      expect(getProjectCreatedMessageMock.mock.calls.length).toBe(1);
-      expect(getProjectCreatedMessageMock.mock.calls[0][0]).toBe(targetDir);
     })
   );
 
@@ -93,35 +82,46 @@ describe("main", () => {
       const targetDir = path.join(tmpPath, projName);
       await fs.mkdir(targetDir);
 
-      try {
-        await main({
-          dirPath: projName,
-          baseDir: tmpPath,
-        });
-      } catch (error) {
-        onlyInstancesOf(UsageError, () => {
-          expect(error.message).toMatch(/dir already exists/);
-        });
-      }
+      await expect(main({
+        dirPath: projName,
+        baseDir: tmpPath,
+      })).rejects
+      .toBeInstanceOf(UsageError);
+
+      await expect(main({
+        dirPath: projName,
+        baseDir: tmpPath,
+      })).rejects
+      .toMatchObject({
+        message: expect.stringMatching(/dir already exists/),
+      });
     })
   );
 
-  test("throws error when directory already exists", () => withTmpDir(
+  test("throws error when one of dependencies throws", () => withTmpDir(
     async (tmpPath) => {
       const projName = "target";
       const getPlaceholderIconMock = jest.fn(() => {
         throw new Error("error");
       });
 
-      try {
-        await main({
-          dirPath: projName,
-          baseDir: tmpPath,
-          getPlaceholderIconFn: getPlaceholderIconMock,
-        });
-      } catch (error) {
-        expect(error.message).toMatch(/error/);
-      }
+      await expect(main({
+        dirPath: projName,
+        baseDir: tmpPath,
+        getPlaceholderIconFn: getPlaceholderIconMock,
+      })).rejects
+      .toMatchObject({
+        message: expect.stringMatching(/error/),
+      });
     })
   );
+});
+
+describe("getProjectCreatedMessage", () => {
+  test("returns message with correct directory", async () => {
+    const targetDir = path.join("target");
+    const returnedMessage = await getProjectCreatedMessage(targetDir);
+
+    expect(returnedMessage).toMatch(new RegExp(targetDir));
+  });
 });

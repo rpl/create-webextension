@@ -35,18 +35,16 @@ a WebExtension from the command line:
   ${chalk.bold.blue("web-ext run -s /path/to/extension")}
 `;
 
-const asciiLogo = fs.readFileSync(
-  path.join(__dirname, "assets", "webextension-logo.ascii")
-);
-
-function getProjectCreatedMessage(projectPath) {
-  const PROJECT_CREATED_MSG = `\n
-  Congratulations!!! A new WebExtension has been created at:
-
+exports.getProjectCreatedMessage = function getProjectCreatedMessage(projectPath, dirname = __dirname) {
+  return fs.readFile(path.join(dirname, "assets", "webextension-logo.ascii"))
+           .then(asciiLogo => {
+             const PROJECT_CREATED_MSG = `\n
+Congratulations!!! A new WebExtension has been created at:
   ${chalk.bold(chalk.green(projectPath))}`;
 
-  return `${asciiLogo} ${PROJECT_CREATED_MSG} ${MORE_INFO_MSG}`;
-}
+             return `${asciiLogo} ${PROJECT_CREATED_MSG} ${MORE_INFO_MSG}`;
+           });
+};
 
 function getProjectReadme(projectDirName) {
   return fs.readFile(path.join(__dirname, "assets", "webextension-logo.ascii"))
@@ -87,13 +85,12 @@ function getProjectManifest(projectDirName) {
   };
 }
 
-function main({
+exports.main = function main({
   dirPath,
   baseDir = process.cwd(),
   getProjectManifestFn = getProjectManifest,
   getPlaceholderIconFn = getPlaceholderIcon,
   getProjectReadmeFn = getProjectReadme,
-  getProjectCreatedMessageFn = getProjectCreatedMessage,
 }) {
   if (!dirPath) {
     throw new Error("Project directory name is a mandatory argument");
@@ -116,7 +113,7 @@ function main({
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
       .then(async () => {
-        const projectCreatedMessage = await getProjectCreatedMessageFn(projectPath);
+        const projectCreatedMessage = await module.exports.getProjectCreatedMessage(projectPath);
         return {projectPath, projectCreatedMessage};
       });
   }, error => {
@@ -125,10 +122,4 @@ function main({
       throw new UsageError(msg);
     }
   });
-}
-
-module.exports = {
-  main,
-  MORE_INFO_MSG,
-  asciiLogo,
 };
