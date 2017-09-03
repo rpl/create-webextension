@@ -5,11 +5,7 @@ const chalk = require("chalk");
 const fs = require("mz/fs");
 const stripAnsi = require("strip-ansi");
 const UsageError = require("./errors").UsageError;
-
-const README = `
-This project contains a blank WebExtension addon, a "white canvas" for your new experiment of
-extending and remixing the Web.
-`;
+const dependenciesMain = require("./dependencies-main");
 
 const MORE_INFO_MSG = `
 
@@ -46,51 +42,10 @@ Congratulations!!! A new WebExtension has been created at:
            });
 };
 
-function getProjectReadme(projectDirName) {
-  return fs.readFile(path.join(__dirname, "assets", "webextension-logo.ascii"))
-    .then(() => {
-      return `# ${projectDirName}\n${README}${MORE_INFO_MSG}`;
-    });
-}
-
-function getPlaceholderIcon() {
-  return fs.readFile(path.join(__dirname, "assets", "icon.png"));
-}
-
-function getProjectManifest(projectDirName) {
-  return {
-    manifest_version: 2,
-    name: projectDirName,
-    version: "0.1",
-    description: `${projectDirName} description`,
-    content_scripts: [
-      {
-        matches: ["https://developer.mozilla.org/*"],
-        js: ["content.js"],
-      },
-    ],
-    permissions: [],
-    icons: {
-      "64": "icon.png",
-    },
-    browser_action: {
-      default_title: `${projectDirName} (browserAction)`,
-      default_icon: {
-        "64": "icon.png",
-      },
-    },
-    background: {
-      scripts: ["background.js"],
-    },
-  };
-}
-
 exports.main = function main({
   dirPath,
   baseDir = process.cwd(),
-  getProjectManifestFn = getProjectManifest,
-  getPlaceholderIconFn = getPlaceholderIcon,
-  getProjectReadmeFn = getProjectReadme,
+  dependencies = dependenciesMain,
 }) {
   if (!dirPath) {
     throw new Error("Project directory name is a mandatory argument");
@@ -102,14 +57,14 @@ exports.main = function main({
   return fs.mkdir(projectPath).then(() => {
     return Promise.all([
       fs.writeFile(path.join(projectPath, "manifest.json"),
-                   JSON.stringify(getProjectManifestFn(projectDirName), null, 2)),
+                   JSON.stringify(dependencies.getProjectManifest(projectDirName), null, 2)),
       fs.writeFile(path.join(projectPath, "background.js"),
                    `console.log("${projectDirName} - background page loaded");`),
       fs.writeFile(path.join(projectPath, "content.js"),
                    `console.log("${projectDirName} - content script loaded");`),
-    ]).then(() => getPlaceholderIconFn())
+    ]).then(() => dependencies.getPlaceholderIcon())
       .then(iconData => fs.writeFile(path.join(projectPath, "icon.png"), iconData))
-      .then(() => getProjectReadmeFn(projectDirName))
+      .then(() => dependencies.getProjectReadme(projectDirName, MORE_INFO_MSG))
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
       .then(async () => {

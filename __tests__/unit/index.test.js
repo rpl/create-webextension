@@ -54,25 +54,22 @@ describe("main", () => {
     async (tmpPath) => {
       const projName = "target";
 
-      const getProjectManifestMock = jest.fn();
-      const getPlaceholderIconMock = jest.fn();
-      const getProjectReadmeMock = jest.fn();
+      jest.mock("../../dependencies-main");
+      const dependenciesMain = require("../../dependencies-main");
 
       await main({
         dirPath: projName,
         baseDir: tmpPath,
-        getProjectManifestFn: getProjectManifestMock,
-        getPlaceholderIconFn: getPlaceholderIconMock,
-        getProjectReadmeFn: getProjectReadmeMock,
+        dependencies: dependenciesMain,
       });
 
-      expect(getProjectManifestMock.mock.calls.length).toBe(1);
-      expect(getProjectManifestMock.mock.calls[0][0]).toBe(projName);
+      expect(dependenciesMain.getProjectManifest.mock.calls.length).toBe(1);
+      expect(dependenciesMain.getProjectManifest.mock.calls[0][0]).toBe(projName);
 
-      expect(getPlaceholderIconMock.mock.calls.length).toBe(1);
+      expect(dependenciesMain.getPlaceholderIcon.mock.calls.length).toBe(1);
 
-      expect(getProjectReadmeMock.mock.calls.length).toBe(1);
-      expect(getProjectReadmeMock.mock.calls[0][0]).toBe(projName);
+      expect(dependenciesMain.getProjectReadme.mock.calls.length).toBe(1);
+      expect(dependenciesMain.getProjectReadme.mock.calls[0][0]).toBe(projName);
     })
   );
 
@@ -101,14 +98,17 @@ describe("main", () => {
   test("throws error when one of dependencies throws", () => withTmpDir(
     async (tmpPath) => {
       const projName = "target";
-      const getPlaceholderIconMock = jest.fn(() => {
+
+      jest.mock("../../dependencies-main");
+      const dependenciesMain = require("../../dependencies-main");
+      dependenciesMain.getPlaceholderIcon = jest.fn(() => {
         throw new Error("error");
       });
 
       await expect(main({
         dirPath: projName,
         baseDir: tmpPath,
-        getPlaceholderIconFn: getPlaceholderIconMock,
+        dependencies: dependenciesMain,
       })).rejects
       .toMatchObject({
         message: expect.stringMatching(/error/),
