@@ -3,7 +3,7 @@
 This npm package provides a CLI utility to create a new simple (and mostly blank) WebExtension
 with only one command.
 
-You can use it by installing the npm package globally (`npm install -g create-webextension`)
+You can use it by installing the npm npx utility (`npx create-webextension my-webextension-project`)
 or by using `yarn create` as an "always updated" shortcut:
 
 ```
