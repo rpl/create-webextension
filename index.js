@@ -58,9 +58,9 @@ exports.main = function main({
       fs.writeFile(path.join(projectPath, "manifest.json"),
                    JSON.stringify(dependencies.getProjectManifest(projectDirName), null, 2)),
       fs.writeFile(path.join(projectPath, "background.js"),
-                   `console.log("${projectDirName} - background page loaded");`),
+                   `console.log("${projectDirName} - background page loaded");\n`),
       fs.writeFile(path.join(projectPath, "content.js"),
-                   `console.log("${projectDirName} - content script loaded");`),
+                   `console.log("${projectDirName} - content script loaded");\n`),
     ]).then(() => dependencies.getPlaceholderIcon())
       .then(iconData => fs.writeFile(path.join(projectPath, "icon.png"), iconData))
       .then(() => dependencies.getProjectReadme(projectDirName, MORE_INFO_MSG))
