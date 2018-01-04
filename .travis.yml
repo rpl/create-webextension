@@ -4,7 +4,7 @@ sudo: false
 # Keep this in sync with appveyor.yml
 node_js:
 - '6'
-- '7'
+- '8'
 
 before_script:
 # If this command fails and you can't fix it, file an issue and add an exception to .nsprc
