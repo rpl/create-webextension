@@ -67,8 +67,8 @@ exports.main = function main({
       .then(() => dependencies.getProjectReadme(projectDirName, MORE_INFO_MSG))
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
-      .then(async () => {
-        const projectCreatedMessage = await module.exports.getProjectCreatedMessage(projectPath);
+      .then(() => module.exports.getProjectCreatedMessage(projectPath))
+      .then(projectCreatedMessage => {
         return {projectPath, projectCreatedMessage};
       });
   }, error => {
