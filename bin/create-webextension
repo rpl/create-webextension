@@ -1,3 +1,25 @@
 #!/usr/bin/env node
+const chalk = require("chalk");
+const UsageError = require("../errors").UsageError;
+const onlyInstancesOf = require("../errors").onlyInstancesOf;
 
-require("..").main();
+
+const USAGE_MSG = `Usage: create-webextension project_dir_name`;
+
+if (!process.argv[2]) {
+  console.error(`${chalk.red("Missing project dir name.")}\n`);
+  console.log(USAGE_MSG);
+  process.exit(1);
+}
+
+require("..").main({dirPath: process.argv[2]})
+  .then(({projectCreatedMessage}) => console.log(projectCreatedMessage))
+  .catch(onlyInstancesOf(UsageError, (error) => {
+    console.error(`${chalk.red(error.message)}\n`);
+    process.exit(1);
+  }))
+  .catch((error) => {
+    // Report the error with its stack trace on unexpected exceptions.
+    console.error(`${chalk.red(error.message)}: ${error.stack}\n`);
+    process.exit(1);
+  });
