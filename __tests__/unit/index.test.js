@@ -88,8 +88,7 @@ describe("main", () => {
       await expect(main({
         dirPath: projName,
         baseDir: tmpPath,
-      })).rejects
-      .toMatchObject({
+      })).rejects.toMatchObject({
         message: expect.stringMatching(/dir already exists/),
       });
     })
@@ -100,18 +99,19 @@ describe("main", () => {
       const projName = "target";
 
       jest.mock("../../dependencies-main");
+
       const dependenciesMain = require("../../dependencies-main");
+
       dependenciesMain.getPlaceholderIcon = jest.fn(() => {
-        throw new Error("error");
+        throw new Error("unexpected dependency error");
       });
 
       await expect(main({
         dirPath: projName,
         baseDir: tmpPath,
         dependencies: dependenciesMain,
-      })).rejects
-      .toMatchObject({
-        message: expect.stringMatching(/error/),
+      })).rejects.toMatchObject({
+        message: expect.stringMatching(/unexpected dependency error/),
       });
     })
   );
