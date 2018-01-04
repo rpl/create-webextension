@@ -31,15 +31,14 @@ a WebExtension from the command line:
   ${chalk.bold.blue("web-ext run -s /path/to/extension")}
 `;
 
-exports.getProjectCreatedMessage = function getProjectCreatedMessage(projectPath, dirname = __dirname) {
-  return fs.readFile(path.join(dirname, "assets", "webextension-logo.ascii"))
-           .then(asciiLogo => {
-             const PROJECT_CREATED_MSG = `\n
-Congratulations!!! A new WebExtension has been created at:
-  ${chalk.bold(chalk.green(projectPath))}`;
+const PROJECT_CREATED_MSG = "\nCongratulations!!! A new WebExtension has been created at:\n\n";
 
-             return `${asciiLogo} ${PROJECT_CREATED_MSG} ${MORE_INFO_MSG}`;
-           });
+exports.getProjectCreatedMessage = function getProjectCreatedMessage(projectPath, dirname = __dirname) {
+  return fs.readFile(path.join(dirname, "assets", "webextension-logo.ascii")).then(asciiLogo => {
+    const formattedProjectPath = `${chalk.bold(chalk.green(projectPath))}`;
+
+    return `\n${asciiLogo} ${PROJECT_CREATED_MSG}  ${formattedProjectPath} ${MORE_INFO_MSG}`;
+  });
 };
 
 exports.main = function main({
@@ -76,5 +75,8 @@ exports.main = function main({
       const msg = `Unable to create a new WebExtension: ${chalk.bold.underline(projectPath)} dir already exists.`;
       throw new UsageError(msg);
     }
+
+    // Re-throw any unexpected errors.
+    throw error;
   });
 };

@@ -19,6 +19,7 @@ require("..").main({dirPath: process.argv[2]})
     process.exit(1);
   }))
   .catch((error) => {
-    console.error(`${chalk.red(error.message)}: ${error.stack}\n`); // or something similar that prints both the message and the stack
+    // Report the error with its stack trace on unexpected exceptions.
+    console.error(`${chalk.red(error.message)}: ${error.stack}\n`);
     process.exit(1);
   });
