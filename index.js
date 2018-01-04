@@ -5,7 +5,7 @@ const chalk = require("chalk");
 const fs = require("mz/fs");
 const stripAnsi = require("strip-ansi");
 const UsageError = require("./errors").UsageError;
-const dependenciesMain = require("./dependencies-main");
+const defaultDependencies = require("./dependencies-main");
 
 const MORE_INFO_MSG = `
 
@@ -44,7 +44,7 @@ exports.getProjectCreatedMessage = function getProjectCreatedMessage(projectPath
 exports.main = function main({
   dirPath,
   baseDir = process.cwd(),
-  dependencies = dependenciesMain,
+  deps = defaultDependencies,
 }) {
   if (!dirPath) {
     throw new Error("Project directory name is a mandatory argument");
@@ -56,14 +56,14 @@ exports.main = function main({
   return fs.mkdir(projectPath).then(() => {
     return Promise.all([
       fs.writeFile(path.join(projectPath, "manifest.json"),
-                   JSON.stringify(dependencies.getProjectManifest(projectDirName), null, 2)),
+                   JSON.stringify(deps.getProjectManifest(projectDirName), null, 2)),
       fs.writeFile(path.join(projectPath, "background.js"),
                    `console.log("${projectDirName} - background page loaded");\n`),
       fs.writeFile(path.join(projectPath, "content.js"),
                    `console.log("${projectDirName} - content script loaded");\n`),
-    ]).then(() => dependencies.getPlaceholderIcon())
+    ]).then(() => deps.getPlaceholderIcon())
       .then(iconData => fs.writeFile(path.join(projectPath, "icon.png"), iconData))
-      .then(() => dependencies.getProjectReadme(projectDirName, MORE_INFO_MSG))
+      .then(() => deps.getProjectReadme(projectDirName, MORE_INFO_MSG))
       .then(projectReadme => fs.writeFile(path.join(projectPath, "README.md"),
                                           stripAnsi(projectReadme)))
       .then(() => module.exports.getProjectCreatedMessage(projectPath))

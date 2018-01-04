@@ -55,21 +55,21 @@ describe("main", () => {
       const projName = "target";
 
       jest.mock("../../dependencies-main");
-      const dependenciesMain = require("../../dependencies-main");
+      const mockedDependencies = require("../../dependencies-main");
 
       await main({
         dirPath: projName,
         baseDir: tmpPath,
-        dependencies: dependenciesMain,
+        deps: mockedDependencies,
       });
 
-      expect(dependenciesMain.getProjectManifest.mock.calls.length).toBe(1);
-      expect(dependenciesMain.getProjectManifest.mock.calls[0][0]).toBe(projName);
+      expect(mockedDependencies.getProjectManifest.mock.calls.length).toBe(1);
+      expect(mockedDependencies.getProjectManifest.mock.calls[0][0]).toBe(projName);
 
-      expect(dependenciesMain.getPlaceholderIcon.mock.calls.length).toBe(1);
+      expect(mockedDependencies.getPlaceholderIcon.mock.calls.length).toBe(1);
 
-      expect(dependenciesMain.getProjectReadme.mock.calls.length).toBe(1);
-      expect(dependenciesMain.getProjectReadme.mock.calls[0][0]).toBe(projName);
+      expect(mockedDependencies.getProjectReadme.mock.calls.length).toBe(1);
+      expect(mockedDependencies.getProjectReadme.mock.calls[0][0]).toBe(projName);
     })
   );
 
@@ -100,16 +100,16 @@ describe("main", () => {
 
       jest.mock("../../dependencies-main");
 
-      const dependenciesMain = require("../../dependencies-main");
+      const mockedDependencies = require("../../dependencies-main");
 
-      dependenciesMain.getPlaceholderIcon = jest.fn(() => {
+      mockedDependencies.getPlaceholderIcon = jest.fn(() => {
         throw new Error("unexpected dependency error");
       });
 
       await expect(main({
         dirPath: projName,
         baseDir: tmpPath,
-        dependencies: dependenciesMain,
+        deps: mockedDependencies,
       })).rejects.toMatchObject({
         message: expect.stringMatching(/unexpected dependency error/),
       });
