@@ -3,17 +3,17 @@
 const path = require("path");
 const fs = require("mz/fs");
 const linter = require("addons-linter");
+const inquirer = require("inquirer");
 const withTmpDir = require("./helpers/tmp-dir");
 const cmdRunner = require("./helpers/cmd-runner");
-const inquirer = require('inquirer');
 
 const execDirPath = path.join(__dirname, "..", "bin");
 
-jest.mock('inquirer');
+jest.mock("inquirer");
 const promptAnswers = {
-  description: 'some description',
+  description: "some description",
   popup: true,
-  contentScript: false
+  contentScript: false,
 };
 inquirer.prompt.mockResolvedValue(promptAnswers);
 
@@ -33,7 +33,7 @@ describe("main", () => {
         const manifest = fs.readFile(path.join(targetDir, "manifest.json"), "utf-8");
         const parsed = JSON.parse(manifest);
         expect(parsed.name).toEqual(projName);
-        expect(parsed.description).toEqual(answers.description);
+        expect(parsed.description).toEqual(promptAnswers.description);
       });
     })
   );
