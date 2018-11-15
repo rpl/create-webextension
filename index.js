@@ -133,7 +133,6 @@ exports.main = function main() {
 
   return fs.mkdir(projectPath).then(() => {
     inquirer.prompt(QUESTIONS).then(answers => {
-      console.log(answers);
       fs.writeFile(path.join(projectPath, "manifest.json"),
                    JSON.stringify(getProjectManifest(projectDirName, answers), null, 2))
       if (answers.background) {
